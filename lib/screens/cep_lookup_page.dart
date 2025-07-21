@@ -23,17 +23,19 @@ class _CepLookupPageState extends State<CepLookupPage> {
 
   Future<void> _searchCep() async {
     // Esconde o teclado
-    FocusScope.of(context).unfocus();
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-      _enderecoResult = null;
+    FocusScope.of(context).unfocus(); // 6 - Aqui esconde o teclado
+    setState(() { // 7 - aqui informa que algo mudou
+      _isLoading = true; // 8 - ativmos o circulo de progresso acontecer
+      _errorMessage = null; // 9 - limpadmos qualquer erro anterior
+      _enderecoResult = null; // 10 - limpamos qualquer resultado anterior
     });
-
-    try {
+ 
+    try { // 11 - aqui envolvemos nossa chamada API em bloco Try, pede para fazer o que tem dentro.
+      // Se der errado não quebre o app, pule para o bloco catch
       // A UI chama o serviço para buscar os dados.
       // Ela não sabe como ele busca, apenas que retorna um Endereco.
-      final endereco = await _cepService.fetchCep(_cepController.text);
+      final endereco = await _cepService.fetchCep(_cepController.text); // 12 - Aqui é a delegação da responsabilidade
+      // a interface não sabe buscar o CEP. Ela chama a função _cepService e entrega o CEp que o usuario digitou
       setState(() {
         _enderecoResult = endereco;
       });
@@ -58,8 +60,10 @@ class _CepLookupPageState extends State<CepLookupPage> {
         child: Column(
           children: [
             TextField(
-              controller: _cepController,
-              keyboardType: TextInputType.number,
+              controller: _cepController, // 1 - _cepController é um controlador. Ele é o espião
+              // do campo de texto, nos permitindo ler o que o usuário digitou e também limpar o campo se precisarmos.
+              keyboardType: TextInputType.number, // 2 - Ele faz com que o teclado numérico apareça no celular,
+              // já que só queremos núermos. Para melhorar a experiência do usuário.
               decoration: const InputDecoration(
                 labelText: 'Digite o CEP',
                 hintText: 'Apenas números',
@@ -67,15 +71,16 @@ class _CepLookupPageState extends State<CepLookupPage> {
               ),
               // Formatação para aceitar apenas 8 dígitos numéricos.
               inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
+                FilteringTextInputFormatter.digitsOnly, // 3 - 2 formatadores. O primeiro, digitsOnly força
+                // que apenas números possam ser digitados. O segundo, Length... impede que o usuário digite mais de 8 digitos.
                 LengthLimitingTextInputFormatter(8),
               ],
             ),
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _searchCep,
+              child: ElevatedButton( // 4 - Após digitar o CEP, o usuário irá clicar no ElevateButton
+                onPressed: _searchCep, // 5 - Quando o botão for pressionado, ele chama essa função
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
